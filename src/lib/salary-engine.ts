@@ -239,10 +239,10 @@ export function calculateFromNet(targetNetAnnual: number, info: PersonalInfo): C
 
 export function calculateInsights(
     netMonthly: number,
-    expenses: { housing: number; food: number; utilities: number; transport: number; pets: number; leisure: number; subscriptions: number }
+    expenses: { housing: number; food: number; utilities: number; transport: number; pets: number; insurance: number; leisure: number; subscriptions: number; sports: number; travel: number }
 ): FinancialInsightsResult {
-    const needsActual = expenses.housing + expenses.food + expenses.utilities + expenses.transport + expenses.pets;
-    const wantsActual = expenses.leisure + expenses.subscriptions;
+    const needsActual = expenses.housing + expenses.food + expenses.utilities + expenses.transport + expenses.pets + expenses.insurance;
+    const wantsActual = expenses.leisure + expenses.subscriptions + expenses.sports + expenses.travel;
     const totalExpenses = needsActual + wantsActual;
     const savingsActual = Math.max(netMonthly - totalExpenses, 0);
 

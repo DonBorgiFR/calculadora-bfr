@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle, Users, Smartphone } from 'lucide-react';
+import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle, Users, Smartphone, Shield, Dumbbell, Plane } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { calculateInsights } from '../lib/salary-engine';
 import { FinancialInsights } from './FinancialInsights';
@@ -17,8 +17,11 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
     const [leisure, setLeisure] = useState(100);
     const [pets, setPets] = useState(0);
     const [subscriptions, setSubscriptions] = useState(30);
+    const [insurance, setInsurance] = useState(50);
+    const [sports, setSports] = useState(40);
+    const [travel, setTravel] = useState(0);
 
-    const totalExpenses = rent + food + utilities + transport + leisure + pets + subscriptions;
+    const totalExpenses = rent + food + utilities + transport + leisure + pets + subscriptions + insurance + sports + travel;
     const remaining = netMonthly - totalExpenses;
     const isDeficit = remaining < 0;
 
@@ -30,7 +33,7 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
         { name: 'Ahorro', value: isDeficit ? 0 : remaining, color: '#10b981' }
     ];
 
-    const insights = calculateInsights(netMonthly, { housing: rent, food, utilities, transport, leisure, pets, subscriptions });
+    const insights = calculateInsights(netMonthly, { housing: rent, food, utilities, transport, leisure, pets, subscriptions, insurance, sports, travel });
 
     return (
         <div className="flex flex-col gap-6 animate-fadeIn">
@@ -103,14 +106,17 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                     Ajusta tu Nivel de Vida
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <CostInput label="Vivienda (Alquiler/Hipoteca)" icon={<Home size={16} />} value={rent} setValue={setRent} max={3000} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <CostInput label="Vivienda (Alquil/Hip)" icon={<Home size={16} />} value={rent} setValue={setRent} max={3000} />
                     <CostInput label="Alimentación" icon={<ShoppingBasket size={16} />} value={food} setValue={setFood} max={1000} />
-                    <CostInput label="Servicios (Luz, Internet)" icon={<Zap size={16} />} value={utilities} setValue={setUtilities} max={500} />
+                    <CostInput label="Servicios (Luz, Int)" icon={<Zap size={16} />} value={utilities} setValue={setUtilities} max={500} />
                     <CostInput label="Transporte" icon={<TrainFront size={16} />} value={transport} setValue={setTransport} max={500} />
-                    <CostInput label="Ocio y Ropa" icon={<Coffee size={16} />} value={leisure} setValue={setLeisure} max={1500} />
+                    <CostInput label="Seguros (Salud, Coche)" icon={<Shield size={16} />} value={insurance} setValue={setInsurance} max={400} />
+                    <CostInput label="Ocio y Cenas" icon={<Coffee size={16} />} value={leisure} setValue={setLeisure} max={1500} />
                     <CostInput label="Mascotas / Hijos" icon={<Users size={16} />} value={pets} setValue={setPets} max={1000} />
                     <CostInput label="Suscripciones y Apps" icon={<Smartphone size={16} />} value={subscriptions} setValue={setSubscriptions} max={300} />
+                    <CostInput label="Deporte y Gimnasio" icon={<Dumbbell size={16} />} value={sports} setValue={setSports} max={300} />
+                    <CostInput label="Viajes / Ahorro Vacaciones" icon={<Plane size={16} />} value={travel} setValue={setTravel} max={1000} />
                 </div>
             </div>
 
@@ -124,13 +130,25 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
 function CostInput({ label, icon, value, setValue, max }: { label: string, icon: React.ReactNode, value: number, setValue: (val: number) => void, max: number }) {
     return (
         <div className="space-y-3">
-            <div className="flex justify-between items-end">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                    <span className="text-slate-400">{icon}</span> {label}
+            <div className="flex justify-between items-end gap-2">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5 truncate">
+                    <span className="text-slate-400 shrink-0">{icon}</span>
+                    <span className="truncate" title={label}>{label}</span>
                 </label>
-                <span className="font-semibold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-sm">
-                    {value} €
-                </span>
+                <div className="relative shrink-0 flex items-center">
+                    <input
+                        type="number"
+                        min="0"
+                        max={max * 2}
+                        value={value}
+                        onChange={(e) => {
+                            let val = parseInt(e.target.value) || 0;
+                            setValue(val);
+                        }}
+                        className="w-16 sm:w-20 font-semibold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 pr-6 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span className="absolute right-2 text-slate-500 text-sm font-medium pointer-events-none">€</span>
+                </div>
             </div>
             <input
                 type="range"
