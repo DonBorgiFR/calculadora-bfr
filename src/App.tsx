@@ -46,7 +46,7 @@ export default function App() {
   }, [amount, direction, age, disability, childrenCount, payments, region]);
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden selection:bg-blue-500/30">
+    <div className="min-h-screen relative overflow-x-hidden selection:bg-blue-500/30 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-500">
       {/* Background Animated Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-lighten animate-blob" />
