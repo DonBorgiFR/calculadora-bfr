@@ -23,6 +23,9 @@ export default function App() {
   // Modal de Portfolio
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
+  // Pestañas de Resultados
+  const [activeTab, setActiveTab] = useState<'nomina' | 'canasta' | 'empresa'>('nomina');
+
   useEffect(() => {
     const num = parseFloat(amount);
     if (isNaN(num) || num <= 0) {
@@ -98,7 +101,11 @@ export default function App() {
           </div>
 
           <div className="lg:col-span-7 sticky top-8">
-            <ResultsDashboard result={result} />
+            <ResultsDashboard
+              result={result}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
           </div>
         </main>
       </div>
