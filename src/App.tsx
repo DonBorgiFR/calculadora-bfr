@@ -96,8 +96,6 @@ export default function App() {
               payments={payments} setPayments={setPayments}
               region={region} setRegion={setRegion}
             />
-            {/* Se balancea la UI utilizando el espacio inerte en LG para el Stepper */}
-            <DidacticExplanation result={result} />
           </div>
 
           <div className="lg:col-span-7 sticky top-8">
@@ -108,6 +106,11 @@ export default function App() {
             />
           </div>
         </main>
+
+        <div className="mt-8 lg:mt-12 mb-12">
+          {/* Cómo funciona tu nómina: movido tras los módulos interactivos */}
+          <DidacticExplanation result={result} />
+        </div>
       </div>
 
       {/* Footer Minimalista / Zen */}

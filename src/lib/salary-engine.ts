@@ -239,10 +239,10 @@ export function calculateFromNet(targetNetAnnual: number, info: PersonalInfo): C
 
 export function calculateInsights(
     netMonthly: number,
-    expenses: { housing: number; food: number; utilities: number; transport: number; leisure: number }
+    expenses: { housing: number; food: number; utilities: number; transport: number; pets: number; leisure: number; subscriptions: number }
 ): FinancialInsightsResult {
-    const needsActual = expenses.housing + expenses.food + expenses.utilities + expenses.transport;
-    const wantsActual = expenses.leisure;
+    const needsActual = expenses.housing + expenses.food + expenses.utilities + expenses.transport + expenses.pets;
+    const wantsActual = expenses.leisure + expenses.subscriptions;
     const totalExpenses = needsActual + wantsActual;
     const savingsActual = Math.max(netMonthly - totalExpenses, 0);
 
@@ -251,9 +251,10 @@ export function calculateInsights(
     const savingsTarget = netMonthly * 0.20;
 
     // Regla Hipoteca Banco de España: 35% máximo de capacidad de endeudamiento.
+    // Además, limitamos a la capacidad real de ahorro.
     // Calculo financiero de capital máximo: Valor Actual de una Anualidad (Préstamo Francés).
     // Interés asumido 3.5% anual (0.035 / 12), a 30 años (360 meses).
-    const maxMonthlyPayment = netMonthly * 0.35;
+    const maxMonthlyPayment = Math.max(0, Math.min(netMonthly * 0.35, savingsActual));
     const monthlyRate = 0.035 / 12;
     const numPayments = 360; // 30 years
     const maxLoanAmount = maxMonthlyPayment * ((1 - Math.pow(1 + monthlyRate, -numPayments)) / monthlyRate);

@@ -13,10 +13,6 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
     const isWantsOk = rule503020.wantsActual <= rule503020.wantsTarget * 1.05;
     const isSavingsOk = rule503020.savingsActual >= rule503020.savingsTarget * 0.95;
 
-    const totalCalculated = rule503020.needsActual + rule503020.wantsActual + rule503020.savingsActual;
-    const needsPct = (rule503020.needsActual / totalCalculated) * 100 || 0;
-    const wantsPct = (rule503020.wantsActual / totalCalculated) * 100 || 0;
-    const savingsPct = (rule503020.savingsActual / totalCalculated) * 100 || 0;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn mt-6">
@@ -33,15 +29,15 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                 </div>
                 <div className="space-y-4">
                     <InsightRow
-                        label="Necesidades" pct={needsPct} amount={rule503020.needsActual}
+                        label="Necesidades" targetPct={50} amount={rule503020.needsActual}
                         isOk={isNeedsOk} okColor="text-emerald-500" warnColor="text-rose-500"
                     />
                     <InsightRow
-                        label="Deseos" pct={wantsPct} amount={rule503020.wantsActual}
+                        label="Deseos" targetPct={30} amount={rule503020.wantsActual}
                         isOk={isWantsOk} okColor="text-emerald-500" warnColor="text-rose-500"
                     />
                     <InsightRow
-                        label="Ahorro" pct={savingsPct} amount={rule503020.savingsActual}
+                        label="Ahorro" targetPct={20} amount={rule503020.savingsActual}
                         isOk={isSavingsOk} okColor="text-emerald-500" warnColor="text-amber-500" bold
                     />
                 </div>
@@ -86,7 +82,7 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                         {timeValue.hourlyRate.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}<span className="text-xl">/h</span>
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                        Tus lujos valen <span className="font-bold text-slate-800 dark:text-slate-200">{(rule503020.wantsActual / timeValue.hourlyRate).toFixed(0)} horas puras</span> laborables al mes.
+                        Tus lujos valen <span className="font-bold text-slate-800 dark:text-slate-200">{(rule503020.wantsActual / timeValue.hourlyRate).toFixed(0)} horas puras laborables</span> al mes.
                     </p>
                 </div>
             </div>
@@ -94,15 +90,15 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
     );
 }
 
-function InsightRow({ label, pct, amount, isOk, okColor, warnColor, bold = false }: { label: string, pct: number, amount: number, isOk: boolean, okColor: string, warnColor: string, bold?: boolean }) {
+function InsightRow({ label, targetPct, amount, isOk, okColor, warnColor, bold = false }: { label: string, targetPct: number, amount: number, isOk: boolean, okColor: string, warnColor: string, bold?: boolean }) {
     return (
         <div className={`flex justify-between items-center text-sm ${bold ? 'font-semibold' : ''}`}>
             <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${isOk ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                {label} ({pct.toFixed(0)}%)
+                {label}:
             </span>
-            <span className={`font-medium ${isOk ? okColor : warnColor}`}>
-                {amount.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+            <span className={`font-medium ${isOk ? okColor : warnColor} text-right`}>
+                {amount.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} <span className="opacity-60 text-xs ml-1 font-normal">(Ref: {targetPct}%)</span>
             </span>
         </div>
     );

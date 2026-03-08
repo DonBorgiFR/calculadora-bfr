@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle } from 'lucide-react';
+import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle, Users, Smartphone } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { calculateInsights } from '../lib/salary-engine';
 import { FinancialInsights } from './FinancialInsights';
@@ -14,9 +14,11 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
     const [food, setFood] = useState(250);
     const [utilities, setUtilities] = useState(120);
     const [transport, setTransport] = useState(50);
-    const [leisure, setLeisure] = useState(150);
+    const [leisure, setLeisure] = useState(100);
+    const [pets, setPets] = useState(0);
+    const [subscriptions, setSubscriptions] = useState(30);
 
-    const totalExpenses = rent + food + utilities + transport + leisure;
+    const totalExpenses = rent + food + utilities + transport + leisure + pets + subscriptions;
     const remaining = netMonthly - totalExpenses;
     const isDeficit = remaining < 0;
 
@@ -28,7 +30,7 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
         { name: 'Ahorro', value: isDeficit ? 0 : remaining, color: '#10b981' }
     ];
 
-    const insights = calculateInsights(netMonthly, { housing: rent, food, utilities, transport, leisure });
+    const insights = calculateInsights(netMonthly, { housing: rent, food, utilities, transport, leisure, pets, subscriptions });
 
     return (
         <div className="flex flex-col gap-6 animate-fadeIn">
@@ -101,12 +103,14 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                     Ajusta tu Nivel de Vida
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <CostInput label="Vivienda (Alquiler/Hipoteca)" icon={<Home size={16} />} value={rent} setValue={setRent} max={3000} />
                     <CostInput label="Alimentación" icon={<ShoppingBasket size={16} />} value={food} setValue={setFood} max={1000} />
                     <CostInput label="Servicios (Luz, Internet)" icon={<Zap size={16} />} value={utilities} setValue={setUtilities} max={500} />
                     <CostInput label="Transporte" icon={<TrainFront size={16} />} value={transport} setValue={setTransport} max={500} />
                     <CostInput label="Ocio y Ropa" icon={<Coffee size={16} />} value={leisure} setValue={setLeisure} max={1500} />
+                    <CostInput label="Mascotas / Hijos" icon={<Users size={16} />} value={pets} setValue={setPets} max={1000} />
+                    <CostInput label="Suscripciones y Apps" icon={<Smartphone size={16} />} value={subscriptions} setValue={setSubscriptions} max={300} />
                 </div>
             </div>
 
