@@ -1,4 +1,5 @@
-import { Target, Home, Clock } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Target, Home, Clock, Info, X } from 'lucide-react';
 import type { FinancialInsightsResult } from '../lib/types';
 
 interface FinancialInsightsProps {
@@ -54,7 +55,10 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                         <Home size={20} />
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight" title="Basado en la regla de endeudamiento sano: no asumas deudas que superen tu capacidad disponible ni el 35% de tu sueldo. Calculo asume un préstamo a 30 años.">Poder Adquisitivo</h4>
+                        <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">Poder Adquisitivo</h4>
+                            <MobileTooltip text="Basado en la regla de endeudamiento sano: no asumas deudas que superen tu capacidad de ahorro disponible, ni el límite del 35% de tu sueldo neto impuesto por Banco de España. El cálculo asume un préstamo a 30 años con un tipo del 3.5%." />
+                        </div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-500">Calcula tu Hipoteca</p>
                     </div>
                 </div>
@@ -76,7 +80,10 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                         <Clock size={20} />
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight" title="Tu tiempo es finito. Cuánto tiempo trabajas en exclusiva para pagar un lujo.">El Coste de la Vida</h4>
+                        <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">El Coste de la Vida</h4>
+                            <MobileTooltip text="Descubre cuánto tiempo real de tu vida entregas a tu empresa en exclusiva para poder pagar un capricho. Basado en una jornada estándar de 160h laborables/mes." />
+                        </div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-500">Tu Tiempo es Dinero</p>
                     </div>
                 </div>
@@ -107,6 +114,53 @@ function InsightRow({ label, targetPct, actualPct, amount, isOk, okColor, warnCo
                     Tu: {actualPct.toFixed(0)}% <span className="text-slate-400 font-light mx-0.5">|</span> Ref: {targetPct}%
                 </span>
             </span>
+        </div>
+    );
+}
+
+function MobileTooltip({ text }: { text: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+
+    // Auto-cierre al pinchar fuera
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    return (
+        <div className="relative flex items-center" ref={tooltipRef}>
+            <button
+                onClick={(e) => { e.preventDefault(); setIsOpen(!isOpen); }}
+                className="text-slate-400 hover:text-blue-500 transition-colors focus:outline-none"
+                aria-label="Más información"
+            >
+                <Info size={16} />
+            </button>
+
+            {/* Pop-over Card */}
+            {isOpen && (
+                <div className="absolute z-[100] right-0 top-8 w-[280px] sm:w-80 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-700 animate-scaleIn origin-top-right">
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    >
+                        <X size={14} />
+                    </button>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal pr-4">
+                        {text}
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

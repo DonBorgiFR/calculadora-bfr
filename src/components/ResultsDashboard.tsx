@@ -27,33 +27,33 @@ export function ResultsDashboard({ result, activeTab, setActiveTab }: ResultsDas
         <div className="flex flex-col h-full space-y-6">
 
             {/* Header / Nav Tabs (Sistema Semántico ARIA Mobile-First) */}
-            <div className="flex items-center justify-between gap-4 mb-2 overflow-x-auto snap-x scrollbar-hide pb-2" role="tablist" aria-label="Vistas de Análisis Financiero">
+            <div className="flex items-center justify-start sm:justify-between gap-2 sm:gap-4 mb-2 overflow-x-auto snap-x scrollbar-hide pb-2" role="tablist" aria-label="Vistas de Análisis Financiero">
 
                 <button
                     role="tab"
                     aria-selected={activeTab === 'nomina'}
                     onClick={() => setActiveTab('nomina')}
-                    className={`snap-start shrink-0 px-6 py-3 rounded-full flex items-center gap-2 font-semibold transition-all ${activeTab === 'nomina' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'nomina' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
                 >
-                    <Wallet size={18} /> Mi Nómina
+                    <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" /> Mi Nómina
                 </button>
 
                 <button
                     role="tab"
                     aria-selected={activeTab === 'canasta'}
                     onClick={() => setActiveTab('canasta')}
-                    className={`snap-start shrink-0 px-6 py-3 rounded-full flex items-center gap-2 font-semibold transition-all ${activeTab === 'canasta' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'canasta' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
                 >
-                    <ReceiptEuro size={18} /> Coste de Vida
+                    <ReceiptEuro size={16} className="sm:w-[18px] sm:h-[18px]" /> Coste Vida
                 </button>
 
                 <button
                     role="tab"
                     aria-selected={activeTab === 'empresa'}
                     onClick={() => setActiveTab('empresa')}
-                    className={`snap-start shrink-0 px-6 py-3 rounded-full flex items-center gap-2 font-semibold transition-all ${activeTab === 'empresa' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'empresa' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
                 >
-                    <Building2 size={18} /> Costes de Empresa
+                    <Building2 size={16} className="sm:w-[18px] sm:h-[18px]" /> <span className="sm:hidden">Empresa</span><span className="hidden sm:inline">Costes Empresa</span>
                 </button>
             </div>
 

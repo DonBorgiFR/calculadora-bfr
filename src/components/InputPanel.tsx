@@ -42,32 +42,35 @@ export function InputPanel({
 
             <div className="space-y-6">
                 {/* Direction Toggle */}
-                <div className="flex p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">
+                <div className="flex flex-col sm:flex-row p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl gap-1 sm:gap-0">
                     <button
                         onClick={() => setDirection('grossToNet')}
-                        className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${direction === 'grossToNet'
+                        className={`flex-1 py-3 px-2 text-sm font-semibold rounded-xl transition-all duration-300 ${direction === 'grossToNet'
                             ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                             }`}
                     >
-                        De Bruto a Neto
+                        <span className="sm:hidden">Bruto → Neto</span>
+                        <span className="hidden sm:inline">De Bruto a Neto</span>
                     </button>
                     <button
                         onClick={() => setDirection('netToGross')}
-                        className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${direction === 'netToGross'
+                        className={`flex-1 py-3 px-2 text-sm font-semibold rounded-xl transition-all duration-300 ${direction === 'netToGross'
                             ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                             }`}
                     >
-                        De Neto a Bruto
+                        <span className="sm:hidden">Neto → Bruto</span>
+                        <span className="hidden sm:inline">De Neto a Bruto</span>
                     </button>
                 </div>
 
                 {/* Amount */}
-                <div>
+                <div className="relative group">
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                         Importe Anual (€)
                     </label>
+                    <div className="absolute inset-0 top-7 bg-blue-500/5 dark:bg-blue-500/10 blur-xl rounded-2xl transition-opacity opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" />
                     <div className="relative">
                         <input
                             type="number"
@@ -78,10 +81,10 @@ export function InputPanel({
                                 const val = Number(e.target.value);
                                 if (val <= 10000000) setAmount(e.target.value);
                             }}
-                            className="w-full text-2xl font-semibold bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 dark:text-white"
+                            className="w-full text-2xl font-semibold bg-white/70 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 dark:text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
                             placeholder="Ej: 30000"
                         />
-                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">€/año</span>
+                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 font-medium bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-2 py-1 rounded-md">€/año</span>
                     </div>
                 </div>
 
