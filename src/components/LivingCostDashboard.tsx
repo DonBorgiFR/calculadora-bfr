@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { calculateInsights } from '../lib/salary-engine';
+import { FinancialInsights } from './FinancialInsights';
 
 interface LivingCostDashboardProps {
     netMonthly: number;
@@ -25,6 +27,8 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
         { name: 'Gastos Base', value: totalExpenses, color: isDeficit ? '#f43f5e' : '#f59e0b' },
         { name: 'Ahorro', value: isDeficit ? 0 : remaining, color: '#10b981' }
     ];
+
+    const insights = calculateInsights(netMonthly, { housing: rent, food, utilities, transport, leisure });
 
     return (
         <div className="flex flex-col gap-6 animate-fadeIn">
@@ -105,6 +109,9 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                     <CostInput label="Ocio y Ropa" icon={<Coffee size={16} />} value={leisure} setValue={setLeisure} max={1500} />
                 </div>
             </div>
+
+            {/* Fase 11: Píldoras de Inteligencia Financiera */}
+            <FinancialInsights insights={insights} />
 
         </div>
     );

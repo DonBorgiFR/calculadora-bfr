@@ -8,7 +8,7 @@ import {
     IRPF_ANDALUCIA_BRACKETS
 } from './tax-constants';
 import { Region } from './types';
-import type { IRPFBracket } from './types';
+import type { IRPFBracket, FinancialInsightsResult } from './types';
 
 export interface PersonalInfo {
     age: number;
@@ -229,10 +229,53 @@ export function calculateFromNet(targetNetAnnual: number, info: PersonalInfo): C
 
         if (bestAttempt.netAnnual < targetNetAnnual) {
             low = midGross;
+
         } else {
             high = midGross;
         }
     }
-
     return bestAttempt;
+}
+
+export function calculateInsights(
+    netMonthly: number,
+    expenses: { housing: number; food: number; utilities: number; transport: number; leisure: number }
+): FinancialInsightsResult {
+    const needsActual = expenses.housing + expenses.food + expenses.utilities + expenses.transport;
+    const wantsActual = expenses.leisure;
+    const totalExpenses = needsActual + wantsActual;
+    const savingsActual = Math.max(netMonthly - totalExpenses, 0);
+
+    const needsTarget = netMonthly * 0.50;
+    const wantsTarget = netMonthly * 0.30;
+    const savingsTarget = netMonthly * 0.20;
+
+    // Regla Hipoteca Banco de España: 35% máximo de capacidad de endeudamiento.
+    // Calculo financiero de capital máximo: Valor Actual de una Anualidad (Préstamo Francés).
+    // Interés asumido 3.5% anual (0.035 / 12), a 30 años (360 meses).
+    const maxMonthlyPayment = netMonthly * 0.35;
+    const monthlyRate = 0.035 / 12;
+    const numPayments = 360; // 30 years
+    const maxLoanAmount = maxMonthlyPayment * ((1 - Math.pow(1 + monthlyRate, -numPayments)) / monthlyRate);
+
+    // Valor Tiempo: Asumiendo jornada completa normalizada legal 160h.
+    const hourlyRate = netMonthly / 160;
+
+    return {
+        rule503020: {
+            needsTarget,
+            wantsTarget,
+            savingsTarget,
+            needsActual,
+            wantsActual,
+            savingsActual
+        },
+        mortgage: {
+            maxMonthlyPayment,
+            maxLoanAmount
+        },
+        timeValue: {
+            hourlyRate
+        }
+    };
 }
