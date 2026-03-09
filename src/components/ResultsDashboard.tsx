@@ -3,14 +3,16 @@ import { TrendingDown, AlignVerticalSpaceAround, Wallet, Building2, ReceiptEuro 
 import { CompanyCosts } from './CompanyCosts';
 import { CostDistributionChart } from './CostDistributionChart';
 import { LivingCostDashboard } from './LivingCostDashboard';
+import { FinancialInsights } from './FinancialInsights';
 
 interface ResultsDashboardProps {
     result: CalculationResult | null;
     activeTab: 'nomina' | 'canasta' | 'empresa';
     setActiveTab: (tab: 'nomina' | 'canasta' | 'empresa') => void;
+    isAdvancedMode?: boolean;
 }
 
-export function ResultsDashboard({ result, activeTab, setActiveTab }: ResultsDashboardProps) {
+export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMode = false }: ResultsDashboardProps) {
     if (!result) return (
         <div className="h-full flex items-center justify-center p-8 text-slate-400 dark:text-slate-500">
             Introduce un importe para ver el cálculo al instante.
@@ -27,38 +29,40 @@ export function ResultsDashboard({ result, activeTab, setActiveTab }: ResultsDas
         <div className="flex flex-col h-full space-y-6">
 
             {/* Header / Nav Tabs (Sistema Semántico ARIA Mobile-First) */}
-            <div className="flex items-center justify-start sm:justify-between gap-2 sm:gap-4 mb-2 overflow-x-auto snap-x scrollbar-hide pb-2" role="tablist" aria-label="Vistas de Análisis Financiero">
+            <div className={`transition-all duration-500 overflow-hidden ${isAdvancedMode ? 'max-h-20 opacity-100 mb-2' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}>
+                <div className="flex items-center justify-start sm:justify-between gap-2 sm:gap-4 overflow-x-auto snap-x scrollbar-hide pb-2" role="tablist" aria-label="Vistas de Análisis Financiero">
 
-                <button
-                    role="tab"
-                    aria-selected={activeTab === 'nomina'}
-                    onClick={() => setActiveTab('nomina')}
-                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'nomina' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
-                >
-                    <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" /> Mi Nómina
-                </button>
+                    <button
+                        role="tab"
+                        aria-selected={activeTab === 'nomina'}
+                        onClick={() => setActiveTab('nomina')}
+                        className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'nomina' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    >
+                        <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" /> Mi Nómina
+                    </button>
 
-                <button
-                    role="tab"
-                    aria-selected={activeTab === 'canasta'}
-                    onClick={() => setActiveTab('canasta')}
-                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'canasta' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
-                >
-                    <ReceiptEuro size={16} className="sm:w-[18px] sm:h-[18px]" /> Coste Vida
-                </button>
+                    <button
+                        role="tab"
+                        aria-selected={activeTab === 'canasta'}
+                        onClick={() => setActiveTab('canasta')}
+                        className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'canasta' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    >
+                        <ReceiptEuro size={16} className="sm:w-[18px] sm:h-[18px]" /> Coste Vida
+                    </button>
 
-                <button
-                    role="tab"
-                    aria-selected={activeTab === 'empresa'}
-                    onClick={() => setActiveTab('empresa')}
-                    className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'empresa' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
-                >
-                    <Building2 size={16} className="sm:w-[18px] sm:h-[18px]" /> <span className="sm:hidden">Empresa</span><span className="hidden sm:inline">Costes Empresa</span>
-                </button>
+                    <button
+                        role="tab"
+                        aria-selected={activeTab === 'empresa'}
+                        onClick={() => setActiveTab('empresa')}
+                        className={`snap-start shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base transition-all ${activeTab === 'empresa' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg' : 'bg-white/50 dark:bg-slate-900/50 text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-white'}`}
+                    >
+                        <Building2 size={16} className="sm:w-[18px] sm:h-[18px]" /> <span className="sm:hidden">Empresa</span><span className="hidden sm:inline">Costes Empresa</span>
+                    </button>
+                </div>
             </div>
 
             {/* TAB CONTENT: MI NÓMINA (Por defecto) */}
-            {activeTab === 'nomina' && (
+            {(activeTab === 'nomina' || !isAdvancedMode) && (
                 <div className="space-y-6 animate-fadeIn">
                     {/* Main Net Card */}
                     <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
@@ -127,8 +131,8 @@ export function ResultsDashboard({ result, activeTab, setActiveTab }: ResultsDas
                         </div>
                     </div>
 
-                    {/* Deductions Detailed Grid */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Deductions Detailed Grid (Solo Avanzado) */}
+                    <div className={`grid grid-cols-2 gap-4 transition-all duration-500 overflow-hidden ${isAdvancedMode ? 'max-h-[500px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0 pointer-events-none'}`}>
                         <div className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/30 dark:to-orange-950/20 border border-rose-100 dark:border-rose-900/30 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
                             <div>
                                 <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 mb-1">
@@ -155,16 +159,21 @@ export function ResultsDashboard({ result, activeTab, setActiveTab }: ResultsDas
                             </div>
                         </div>
                     </div>
+
+                    {/* Insights Premium (Solo Avanzado) */}
+                    <div className={`transition-all duration-700 overflow-hidden ${isAdvancedMode ? 'max-h-[2000px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0 pointer-events-none'}`}>
+                        {result.financialInsights && <FinancialInsights insights={result.financialInsights} />}
+                    </div>
                 </div>
             )}
 
             {/* TAB CONTENT: CANASTA DE VIDA */}
-            {activeTab === 'canasta' && (
+            {activeTab === 'canasta' && isAdvancedMode && (
                 <LivingCostDashboard netMonthly={result.netMonthly} />
             )}
 
             {/* TAB CONTENT: COSTES EMPRESA */}
-            {activeTab === 'empresa' && (
+            {activeTab === 'empresa' && isAdvancedMode && (
                 <div className="grid grid-cols-1 gap-6 animate-fadeIn">
                     <CostDistributionChart
                         netAnnual={result.netAnnual}

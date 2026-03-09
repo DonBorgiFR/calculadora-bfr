@@ -26,6 +26,9 @@ export default function App() {
   // Pestañas de Resultados
   const [activeTab, setActiveTab] = useState<'nomina' | 'canasta' | 'empresa'>('nomina');
 
+  // Fase 11: UX Minimalista
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+
   useEffect(() => {
     const num = parseFloat(amount);
     if (isNaN(num) || num <= 0) {
@@ -75,14 +78,30 @@ export default function App() {
             </p>
           </div>
 
-          {/* Botón Portfolio Showcase */}
-          <button
-            onClick={() => setIsAboutOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all font-medium text-sm backdrop-blur-md shadow-sm mt-4 lg:mt-0"
-          >
-            <Info size={18} />
-            <span>Sobre el Proyecto</span>
-          </button>
+          {/* Controles: Portfolio & Modo Avanzado */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 lg:mt-0">
+            {/* Toggle Simple / Avanzado */}
+            <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-900/50 p-1.5 rounded-full border border-slate-200 dark:border-slate-800 backdrop-blur-md shadow-sm">
+              <span className={`text-sm font-medium pl-3 transition-colors ${!isAdvancedMode ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>Simple</span>
+              <button
+                onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                className="relative w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-50 dark:focus:ring-offset-slate-950"
+                aria-label="Alternar modo avanzado"
+              >
+                <div className={`absolute left-1 top-1 w-4 h-4 rounded-full transition-transform duration-300 ease-in-out ${isAdvancedMode ? 'translate-x-6 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]' : 'translate-x-0 bg-white shadow-sm'}`} />
+              </button>
+              <span className={`text-sm font-medium pr-3 transition-colors ${isAdvancedMode ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>Avanzado</span>
+            </div>
+
+            {/* Botón Portfolio Showcase */}
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all font-medium text-sm backdrop-blur-md shadow-sm"
+            >
+              <Info size={18} />
+              <span className="hidden sm:inline">Sobre el Proyecto</span>
+            </button>
+          </div>
         </header>
 
         <main className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -103,6 +122,7 @@ export default function App() {
               result={result}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              isAdvancedMode={isAdvancedMode}
             />
           </div>
         </main>

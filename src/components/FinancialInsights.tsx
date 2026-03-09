@@ -1,166 +1,202 @@
-import { useState, useRef, useEffect } from 'react';
-import { Target, Home, Clock, Info, X } from 'lucide-react';
-import type { FinancialInsightsResult } from '../lib/types';
+import { PieChart, Home, Clock, Smartphone, Coffee, Layers } from 'lucide-react';
+import { useState } from 'react';
 
-interface FinancialInsightsProps {
-    insights: FinancialInsightsResult;
+export interface FinancialInsightsProps {
+    insights: {
+        budgetRule: { needs: number; wants: number; savings: number };
+        maxMortgage: number;
+        hourlyLifeValue: number;
+    };
 }
 
 export function FinancialInsights({ insights }: FinancialInsightsProps) {
-    const { rule503020, mortgage, timeValue } = insights;
+    const [financingPct, setFinancingPct] = useState(80);
+    const needs = insights.budgetRule.needs;
+    const wants = insights.budgetRule.wants;
+    const savings = insights.budgetRule.savings;
+    const mortgage = insights.maxMortgage;
+    const hourly = insights.hourlyLifeValue;
 
-    // Regla 50/30/20 evaluador
-    const isNeedsOk = rule503020.needsActual <= rule503020.needsTarget * 1.05; // 5% margen
-    const isWantsOk = rule503020.wantsActual <= rule503020.wantsTarget * 1.05;
-    const isSavingsOk = rule503020.savingsActual >= rule503020.savingsTarget * 0.95;
+    // Ejemplos de coste de vida basados en la hora
+    const coffeeCost = 35 / hourly; // Cena de 35€
+    const phoneCost = 800 / (hourly * 8); // Días de trabajo (8h/día)
 
-    const totalCalculated = rule503020.needsActual + rule503020.wantsActual + rule503020.savingsActual;
-    const needsPct = (rule503020.needsActual / totalCalculated) * 100 || 0;
-    const wantsPct = (rule503020.wantsActual / totalCalculated) * 100 || 0;
-    const savingsPct = (rule503020.savingsActual / totalCalculated) * 100 || 0;
+    // Matemática Inmobiliaria Interactiva
+    const loanAmount = mortgage * 222; // Multiplicador general de hipoteca al 3.5% 30A
+    const houseValue = loanAmount / (financingPct / 100);
+    const requiredSavings = houseValue - loanAmount + (houseValue * 0.10); // +10% de gastos de C-V aproximados
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn mt-6">
-            {/* 50/30/20 Rule */}
-            <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/40 dark:border-slate-800/60 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <div className="flex items-center gap-3 mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div className="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
-                        <Target size={20} />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">Regla 50/30/20</h4>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500">Salud Financiera</p>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <InsightRow
-                        label="Necesidades" targetPct={50} actualPct={needsPct} amount={rule503020.needsActual}
-                        isOk={isNeedsOk} okColor="text-emerald-500" warnColor="text-rose-500"
-                    />
-                    <InsightRow
-                        label="Deseos" targetPct={30} actualPct={wantsPct} amount={rule503020.wantsActual}
-                        isOk={isWantsOk} okColor="text-emerald-500" warnColor="text-rose-500"
-                    />
-                    <InsightRow
-                        label="Ahorro" targetPct={20} actualPct={savingsPct} amount={rule503020.savingsActual}
-                        isOk={isSavingsOk} okColor="text-emerald-500" warnColor="text-amber-500" bold
-                    />
-                </div>
-            </div>
-
-            {/* Hipoteca */}
-            <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/40 dark:border-slate-800/60 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between">
-                <div className="flex items-center gap-3 mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div className="p-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                        <Home size={20} />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">Poder Adquisitivo</h4>
-                            <MobileTooltip text="Basado en la regla de endeudamiento sano: no asumas deudas que superen tu capacidad de ahorro disponible, ni el límite del 35% de tu sueldo neto impuesto por Banco de España. El cálculo asume un préstamo a 30 años con un tipo del 3.5%." />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500">Calcula tu Hipoteca</p>
-                    </div>
-                </div>
-                <div className="mt-auto pb-2">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 leading-snug">Capital máximo (100% de la hipoteca) según tu ahorro mensual actual y regla 35% BdE:</p>
-                    <p className="text-4xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 mb-3">
-                        {mortgage.maxLoanAmount.toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
-                    </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                        Cuota segura a 30A: <span className="font-bold text-slate-800 dark:text-slate-200">{mortgage.maxMonthlyPayment.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}/mes</span>
-                    </p>
-                </div>
-            </div>
-
-            {/* Valor Tiempo */}
-            <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/40 dark:border-slate-800/60 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between">
-                <div className="flex items-center gap-3 mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
-                        <Clock size={20} />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">El Coste de la Vida</h4>
-                            <MobileTooltip text="Descubre cuánto tiempo real de tu vida entregas a tu empresa en exclusiva para poder pagar un capricho. Basado en una jornada estándar de 160h laborables/mes." />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500">Tu Tiempo es Dinero</p>
-                    </div>
-                </div>
-                <div className="mt-auto pb-2">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 leading-snug">Traduciendo gastos puros a horas trabajadas. Tu precio por Hora Neta trabajada es de:</p>
-                    <p className="text-4xl font-black tracking-tight text-amber-600 dark:text-amber-400 mb-3">
-                        {timeValue.hourlyRate.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}<span className="text-xl">/h</span>
-                    </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                        Soportar tus 'Deseos' cuesta <span className="font-bold text-slate-800 dark:text-slate-200">{(rule503020.wantsActual / timeValue.hourlyRate).toFixed(0)} horas puras</span> laborables.
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function InsightRow({ label, targetPct, actualPct, amount, isOk, okColor, warnColor, bold = false }: { label: string, targetPct: number, actualPct: number, amount: number, isOk: boolean, okColor: string, warnColor: string, bold?: boolean }) {
-    return (
-        <div className={`flex justify-between items-center text-sm ${bold ? 'font-semibold' : ''}`}>
-            <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${isOk ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                {label}:
-            </span>
-            <span className={`font-medium ${isOk ? okColor : warnColor} text-right leading-tight`}>
-                {amount.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} <br className="sm:hidden" />
-                <span className="opacity-70 text-[11px] ml-1 font-normal bg-slate-100 dark:bg-slate-800 py-0.5 px-1.5 rounded-sm whitespace-nowrap">
-                    Tu: {actualPct.toFixed(0)}% <span className="text-slate-400 font-light mx-0.5">|</span> Ref: {targetPct}%
+        <div className="mt-8 space-y-6 animate-fadeIn">
+            <h3 className="text-xl font-medium text-slate-800 dark:text-slate-100 flex items-center gap-3">
+                <span className="bg-slate-100 dark:bg-slate-800 rounded-full p-2 text-blue-500 shadow-sm">
+                    <PieChart size={20} />
                 </span>
-            </span>
-        </div>
-    );
-}
+                Analítica Financiera Zen
+            </h3>
 
-function MobileTooltip({ text }: { text: string }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const tooltipRef = useRef<HTMLDivElement>(null);
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
 
-    // Auto-cierre al pinchar fuera
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        }
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen]);
+                {/* Rule 50/30/20 Card - Zen Mode con Img */}
+                <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 group">
+                    <div className="absolute inset-0 opacity-10 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-opacity duration-700 group-hover:opacity-20">
+                        <img src="/assets/zen_living_cost_bg.png" alt="Zen Background" className="w-full h-full object-cover" />
+                    </div>
 
-    return (
-        <div className="relative flex items-center" ref={tooltipRef}>
-            <button
-                onClick={(e) => { e.preventDefault(); setIsOpen(!isOpen); }}
-                className="text-slate-400 hover:text-blue-500 transition-colors focus:outline-none"
-                aria-label="Más información"
-            >
-                <Info size={16} />
-            </button>
+                    <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30 shadow-sm relative z-10">
+                        <PieChart className="text-emerald-600 dark:text-emerald-400" size={24} strokeWidth={1.5} />
+                    </div>
 
-            {/* Pop-over Card */}
-            {isOpen && (
-                <div className="absolute z-[100] right-0 top-8 w-[280px] sm:w-80 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-700 animate-scaleIn origin-top-right">
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    >
-                        <X size={14} />
-                    </button>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal pr-4">
-                        {text}
+                    <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Regla 50/30/20</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
+                        Balance ideal sugerido por Harvard para organizar tu sueldo.
                     </p>
+
+                    <div className="mt-6 space-y-4">
+                        <div className="group">
+                            <div className="flex justify-between text-sm mb-1.5 font-medium">
+                                <span className="text-emerald-600 dark:text-emerald-400">Necesidades 50%</span>
+                                <span className="text-slate-700 dark:text-slate-200">{needs.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-400 dark:bg-emerald-500 w-1/2 rounded-full transition-all group-hover:bg-emerald-500" />
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-1">Alquiler, comida, luz, transporte.</p>
+                        </div>
+                        <div className="group">
+                            <div className="flex justify-between text-sm mb-1.5 font-medium">
+                                <span className="text-cyan-600 dark:text-cyan-400">Caprichos 30%</span>
+                                <span className="text-slate-700 dark:text-slate-200">{wants.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-cyan-400 dark:bg-cyan-500 w-[30%] rounded-full transition-all group-hover:bg-cyan-500" />
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-1">Ocio, compras, restaurantes, viajes.</p>
+                        </div>
+                        <div className="group">
+                            <div className="flex justify-between text-sm mb-1.5 font-medium">
+                                <span className="text-indigo-600 dark:text-indigo-400">Ahorro 20%</span>
+                                <span className="text-slate-700 dark:text-slate-200">{savings.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-indigo-400 dark:bg-indigo-500 w-[20%] rounded-full transition-all group-hover:bg-indigo-500" />
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-1">Inversión y fondo de emergencia.</p>
+                        </div>
+                    </div>
                 </div>
-            )}
+
+                {/* Mortgage Capability Card - Zen Mode Interactivo */}
+                <div className="relative overflow-hidden rounded-[2rem] bg-indigo-50/40 dark:bg-indigo-900/10 backdrop-blur-xl border border-indigo-100/50 dark:border-indigo-800/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all flex flex-col justify-between group">
+
+                    {/* Floating 3D Icon GenImage */}
+                    <div className="absolute -right-6 -top-6 w-40 h-40 opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-110">
+                        <img src="/assets/zen_mortgage_3d.png" alt="3D Key" className="w-full h-full object-contain drop-shadow-2xl" />
+                    </div>
+
+                    <div className="relative z-10">
+                        <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center border border-blue-200 dark:border-blue-800/30 shadow-sm">
+                            <Home className="text-blue-600 dark:text-blue-400" size={24} strokeWidth={1.5} />
+                        </div>
+
+                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Poder Adquisitivo Hipotecario</h4>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 leading-relaxed">
+                            Respetando el max 30% del BCE. Te protege dejándote un <span className="text-indigo-500 font-medium">70% libre</span> frente a imprevistos o subidas de tipos.
+                        </p>
+                    </div>
+
+                    <div className="mt-6 space-y-4 relative z-10">
+                        <div className="flex justify-between items-end border-b border-indigo-100 dark:border-indigo-800/40 pb-4">
+                            <div>
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Cuota blindada (Max)</p>
+                                <span className="text-3xl font-light tracking-tight text-slate-800 dark:text-slate-100">
+                                    {mortgage.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span className="text-xl text-slate-400">€/mes</span>
+                                </span>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs text-indigo-500/80 dark:text-indigo-400/80 mb-1 flex items-center gap-1 justify-end"><Layers size={12} /> Financiación</p>
+                                <select
+                                    className="bg-white dark:bg-slate-800 border-none font-bold text-sm text-indigo-600 dark:text-indigo-400 rounded-lg outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/30 p-1"
+                                    value={financingPct}
+                                    onChange={(e) => setFinancingPct(Number(e.target.value))}
+                                >
+                                    <option value={70}>70% Banco</option>
+                                    <option value={80}>80% Banco</option>
+                                    <option value={90}>90% Banco</option>
+                                    <option value={100}>100% Banco</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="pt-2 grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Valor Casa Posible</p>
+                                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                    {houseValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Ahorro Requerido</p>
+                                <p className="text-lg font-bold text-slate-700 dark:text-slate-300">
+                                    {financingPct === 100 ? '~ 10%' : `~${(requiredSavings / houseValue * 100).toFixed(0)}%`}
+                                    <span className="text-sm font-medium text-slate-400 ml-1">
+                                        ({requiredSavings.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €)
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Time Value Card - Zen Mode */}
+                <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 flex flex-col justify-between">
+                    <div className="absolute top-10 left-10 w-40 h-40 bg-orange-400/5 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                    <div>
+                        <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 flex items-center justify-center border border-orange-100 dark:border-orange-800/30 shadow-sm">
+                            <Clock className="text-orange-500 dark:text-orange-400" size={24} strokeWidth={1.5} />
+                        </div>
+
+                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Tu Hora de Vida</h4>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
+                            Monetiza tu tiempo para tomar decisiones de compra más sensatas.
+                        </p>
+                    </div>
+
+                    <div className="mt-8 space-y-4">
+                        <div>
+                            <span className="text-4xl font-light tracking-tight text-slate-800 dark:text-slate-100">
+                                {hourly.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} <span className="text-xl text-orange-500">€/h</span>
+                            </span>
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Costes reales en tiempo de trabajo:</p>
+
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5">
+                                <div className="bg-white dark:bg-slate-700 p-1.5 rounded-lg shadow-sm">
+                                    <Coffee size={14} className="text-slate-600 dark:text-slate-300" />
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200">Cena fuera (35€)</p>
+                                    <p className="text-[10px] text-slate-500">{coffeeCost.toFixed(1)} horas de tu vida</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5">
+                                <div className="bg-white dark:bg-slate-700 p-1.5 rounded-lg shadow-sm">
+                                    <Smartphone size={14} className="text-slate-600 dark:text-slate-300" />
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200">Móvil Nuevo (800€)</p>
+                                    <p className="text-[10px] text-slate-500">{phoneCost.toFixed(1)} días enteros de trabajo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     );
 }

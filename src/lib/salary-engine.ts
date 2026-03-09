@@ -48,6 +48,11 @@ export interface CalculationResult {
         total: number;
         totalCompanyCost: number; // Salario Bruto + total SS Empresa
     };
+    financialInsights: {
+        budgetRule: { needs: number; wants: number; savings: number };
+        maxMortgage: number;
+        hourlyLifeValue: number;
+    };
 }
 
 
@@ -196,6 +201,20 @@ export function calculateFromGross(grossAnnual: number, info: PersonalInfo): Cal
 
     const employerCosts = calculateEmployerSocialSecurity(grossAnnual);
 
+    // KI: Inteligencia Financiera
+    const financialInsights = {
+        budgetRule: {
+            needs: netMonthly * 0.50,
+            wants: netMonthly * 0.30,
+            savings: netMonthly * 0.20
+        },
+        // 30% del sueldo neto
+        maxMortgage: netMonthly * 0.30,
+        // Jornada estándar de 1760h / 12 meses -> ~146.6h mes. O Net Anual / 1760.
+        // Vamos a usar Net Annual / 1760
+        hourlyLifeValue: netAnnual / 1760
+    };
+
     return {
         grossAnnual,
         grossMonthly: grossAnnual / info.payments,
@@ -210,7 +229,8 @@ export function calculateFromGross(grossAnnual: number, info: PersonalInfo): Cal
             regionalPortion: info.region !== Region.GENERAL ? regionalPortion : undefined,
             percent: parseFloat(((irpfTaxAmount / grossAnnual) * 100).toFixed(2)) || 0,
         },
-        employerCosts
+        employerCosts,
+        financialInsights
     };
 }
 
