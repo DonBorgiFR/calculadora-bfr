@@ -1,4 +1,4 @@
-import { X, Code2, Lightbulb, AlertCircle } from 'lucide-react';
+import { X, Code2, Lightbulb, AlertCircle, UserCircle2 } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface AboutModalProps {
@@ -92,10 +92,27 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                                 </ul>
                             </div>
                         </div>
+                        {/* Autor perfil */}
+                        <div className="flex gap-4 sm:gap-6 items-start">
+                            <div className="p-3 sm:p-4 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0">
+                                <UserCircle2 size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Sobre el Autor</h3>
+                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm sm:text-base">
+                                    Desarrollado por <strong>Borja Félix Rojas</strong>, Ingeniero Civil Industrial especializado en Control de Gestión y Análisis de Datos (BI/Excel). Con una visión enfocada en la eficiencia operativa, esta herramienta materializa la intersección perfecta entre la innovación técnica, la precisión y el diseño centrado en el usuario.
+                                </p>
+                                <div className="mt-3 flex gap-3">
+                                    <a href="https://www.linkedin.com/in/borjafelixrojas/" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                                        Conectar en LinkedIn &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mt-12 text-center text-sm text-slate-400 dark:text-slate-500 font-medium">
-                        Desarrollado por BFR · {new Date().getFullYear()}
+                        Desarrollado por <a href="https://borjafelixrojas.odoo.com/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 dark:hover:text-slate-300 transition-colors">BFR</a> · {new Date().getFullYear()}
                     </div>
                 </div>
             </div>
