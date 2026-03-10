@@ -2,7 +2,10 @@ export enum Region {
     GENERAL = 'general',
     MADRID = 'madrid',
     CATALUNA = 'cataluna',
-    ANDALUCIA = 'andalucia'
+    ANDALUCIA = 'andalucia',
+    VALENCIA = 'valencia',
+    GALICIA = 'galicia',
+    BALEARES = 'baleares'
 }
 
 export interface IRPFBracket {

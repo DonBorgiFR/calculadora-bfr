@@ -5,7 +5,10 @@ import {
     IRPF_STATE_AUTONOMIC_BRACKETS,
     IRPF_MADRID_BRACKETS,
     IRPF_CATALUNA_BRACKETS,
-    IRPF_ANDALUCIA_BRACKETS
+    IRPF_ANDALUCIA_BRACKETS,
+    IRPF_VALENCIA_BRACKETS,
+    IRPF_GALICIA_BRACKETS,
+    IRPF_BALEARES_BRACKETS
 } from './tax-constants';
 import { Region } from './types';
 import type { IRPFBracket, FinancialInsightsResult } from './types';
@@ -150,6 +153,9 @@ function getRegionalBrackets(region: Region): IRPFBracket[] {
         case Region.MADRID: return IRPF_MADRID_BRACKETS;
         case Region.CATALUNA: return IRPF_CATALUNA_BRACKETS;
         case Region.ANDALUCIA: return IRPF_ANDALUCIA_BRACKETS;
+        case Region.VALENCIA: return IRPF_VALENCIA_BRACKETS;
+        case Region.GALICIA: return IRPF_GALICIA_BRACKETS;
+        case Region.BALEARES: return IRPF_BALEARES_BRACKETS;
         default: return IRPF_GENERAL_BRACKETS; // Fallback
     }
 }

@@ -17,7 +17,10 @@ const REGIONS = [
     { id: Region.GENERAL, name: 'Régimen Común General' },
     { id: Region.MADRID, name: 'Comunidad de Madrid' },
     { id: Region.CATALUNA, name: 'Cataluña' },
-    { id: Region.ANDALUCIA, name: 'Andalucía' }
+    { id: Region.ANDALUCIA, name: 'Andalucía' },
+    { id: Region.VALENCIA, name: 'Comunidad Valenciana' },
+    { id: Region.GALICIA, name: 'Galicia' },
+    { id: Region.BALEARES, name: 'Islas Baleares' }
 ];
 
 export function RegionSelector({ value, onChange }: RegionSelectorProps) {

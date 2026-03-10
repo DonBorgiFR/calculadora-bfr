@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Home, ShoppingBasket, Zap, TrainFront, Coffee, Wallet, AlertTriangle, Users, Smartphone, Shield, Dumbbell, Plane, Activity } from 'lucide-react';
 import { ResponsiveContainer, PieChart as RechartsPie, Pie, Cell, Tooltip } from 'recharts';
+import { InflationImpact } from './InflationImpact';
 
 interface LivingCostDashboardProps {
     netMonthly: number;
@@ -184,6 +185,9 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                     </div>
                 </div>
             </div>
+
+            {/* FASE 13: Módulo MACRO de Inflación */}
+            <InflationImpact netMonthly={netMonthly} fixedExpenses={totalExpenses} />
 
         </div>
     );

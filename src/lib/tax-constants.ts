@@ -76,3 +76,35 @@ export const IRPF_ANDALUCIA_BRACKETS: IRPFBracket[] = [
     { upTo: 60000.00, rate: 0.1850 },
     { upTo: Infinity, rate: 0.2250 },
 ];
+
+export const IRPF_VALENCIA_BRACKETS: IRPFBracket[] = [
+    { upTo: 12450.00, rate: 0.0900 },
+    { upTo: 17000.00, rate: 0.1200 },
+    { upTo: 30000.00, rate: 0.1500 },
+    { upTo: 50000.00, rate: 0.1900 },
+    { upTo: 65000.00, rate: 0.2350 },
+    { upTo: 90000.00, rate: 0.2450 },
+    { upTo: 120000.00, rate: 0.2550 },
+    { upTo: Infinity, rate: 0.2950 },
+];
+
+export const IRPF_GALICIA_BRACKETS: IRPFBracket[] = [
+    { upTo: 12450.00, rate: 0.0900 },
+    { upTo: 20200.00, rate: 0.1175 },
+    { upTo: 27700.00, rate: 0.1550 },
+    { upTo: 35200.00, rate: 0.1700 },
+    { upTo: 47600.00, rate: 0.1900 },
+    { upTo: 60000.00, rate: 0.2150 },
+    { upTo: Infinity, rate: 0.2250 },
+];
+
+export const IRPF_BALEARES_BRACKETS: IRPFBracket[] = [
+    { upTo: 10000.00, rate: 0.0850 },
+    { upTo: 18000.00, rate: 0.1175 },
+    { upTo: 30000.00, rate: 0.1475 },
+    { upTo: 48000.00, rate: 0.1775 },
+    { upTo: 70000.00, rate: 0.1925 },
+    { upTo: 90000.00, rate: 0.2325 },
+    { upTo: 120000.00, rate: 0.2425 },
+    { upTo: Infinity, rate: 0.2500 }
+];
