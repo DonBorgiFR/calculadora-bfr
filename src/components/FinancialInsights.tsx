@@ -44,7 +44,7 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                 Analítica Financiera Zen
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
+            <div className="flex flex-col gap-6 lg:gap-8">
 
                 {/* Rule 50/30/20 Card - Zen Mode con Img */}
                 <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 group">
