@@ -145,6 +145,7 @@ export default function App() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               isAdvancedMode={isAdvancedMode}
+              region={region}
             />
           </div>
         </main>

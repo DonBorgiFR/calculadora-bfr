@@ -4,6 +4,10 @@ import { CompanyCosts } from './CompanyCosts';
 import { CostDistributionChart } from './CostDistributionChart';
 import { LivingCostDashboard } from './LivingCostDashboard';
 import { FinancialInsights } from './FinancialInsights';
+import { useSimulations } from '../lib/useSimulations';
+import { OffersComparator } from './OffersComparator';
+import { Save, Check, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface ResultsDashboardProps {
     result: CalculationResult | null;
@@ -12,7 +16,10 @@ interface ResultsDashboardProps {
     isAdvancedMode?: boolean;
 }
 
-export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMode = false }: ResultsDashboardProps) {
+export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMode = false, region }: ResultsDashboardProps & { region: any }) {
+    const { saveSimulation, canSaveMore } = useSimulations();
+    const [saveState, setSaveState] = useState<'idle'|'saving'|'success'|'error'>('idle');
+
     if (!result) return (
         <div className="h-full flex items-center justify-center p-8 text-slate-400 dark:text-slate-500">
             Introduce un importe para ver el cálculo al instante.
@@ -24,6 +31,38 @@ export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMo
     const employerTotal = result.employerCosts.total;
     const ssPct = (ssTotal / result.grossAnnual) * 100;
     const netPct = (result.netAnnual / result.grossAnnual) * 100;
+
+    const handleSaveOffer = () => {
+        if (!canSaveMore) {
+            setSaveState('error');
+            setTimeout(() => setSaveState('idle'), 2500);
+            return;
+        }
+
+        setSaveState('saving');
+        const offerName = prompt("Nombra esta Oferta/Simulación:", `Oferta ${result.grossAnnual / 1000}k`);
+        if(!offerName) {
+            setSaveState('idle');
+            return;
+        }
+
+        const success = saveSimulation({
+            name: offerName,
+            grossSalary: result.grossAnnual,
+            netSalary: result.netAnnual,
+            freeSavings: result.financialInsights?.budgetRule.savings || 0,
+            livingCosts: result.financialInsights?.budgetRule.needs || 0,
+            region: region
+        });
+
+        if(success) {
+            setSaveState('success');
+            setTimeout(() => setSaveState('idle'), 2000);
+        } else {
+            setSaveState('error');
+            setTimeout(() => setSaveState('idle'), 2000);
+        }
+    }
 
     return (
         <div className="flex flex-col h-full space-y-6">
@@ -87,8 +126,27 @@ export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMo
                                 )}
                             </div>
                         </div>
+
+                        {/* Botón Guardar Simulación Flotante */}
+                        <div className="absolute top-6 right-6 z-20">
+                            <button 
+                                onClick={handleSaveOffer}
+                                disabled={saveState === 'success' || saveState === 'saving'}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 shadow-lg backdrop-blur-md border ${
+                                    saveState === 'success' ? 'bg-emerald-400 text-emerald-950 border-emerald-300' :
+                                    saveState === 'error' ? 'bg-red-500/90 text-white border-red-400' :
+                                    !canSaveMore ? 'bg-slate-800/50 text-slate-400 border-slate-700 cursor-not-allowed opacity-70' :
+                                    'bg-white/20 text-white hover:bg-white/30 border-white/20 hover:scale-105'
+                                }`}
+                            >
+                                {saveState === 'success' && <><Check size={16} /> Guardado</>}
+                                {saveState === 'error' && <><AlertCircle size={16} /> Límite (3)</>}
+                                {saveState === 'idle' && <><Save size={16} /> {canSaveMore ? 'Guardar Oferta' : 'Límite de 3'}</>}
+                            </button>
+                        </div>
+
                         {/* Decorative circle */}
-                        <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
+                        <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
                     </div>
 
                     {/* Breakdown Bar */}
@@ -164,6 +222,9 @@ export function ResultsDashboard({ result, activeTab, setActiveTab, isAdvancedMo
                     <div className={`transition-all duration-700 overflow-hidden ${isAdvancedMode ? 'max-h-[2000px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0 pointer-events-none'}`}>
                         {result.financialInsights && <FinancialInsights insights={result.financialInsights} />}
                     </div>
+
+                    {/* MÓDULO COMPARADOR DE OFERTAS: HITO 1 GRAND FINALE */}
+                    <OffersComparator />
                 </div>
             )}
 
