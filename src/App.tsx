@@ -3,6 +3,8 @@ import { InputPanel } from './components/InputPanel';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { DidacticExplanation } from './components/DidacticExplanation';
 import { AboutModal } from './components/AboutModal';
+import { InstallPWAPrompt } from './components/InstallPWAPrompt';
+import { InteractiveCVModal } from './components/InteractiveCVModal';
 import { Info } from 'lucide-react';
 import { calculateFromGross, calculateFromNet } from './lib/salary-engine';
 import { Region } from './lib/types';
@@ -19,6 +21,7 @@ export default function App() {
 
   // Modal de Portfolio
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isCVMOpen, setIsCVMOpen] = useState(false); // Easter Egg Modal
 
   // Pestañas de Resultados
   const [activeTab, setActiveTab] = useState<'nomina' | 'canasta' | 'empresa'>('nomina');
@@ -46,6 +49,29 @@ export default function App() {
       return calculateFromNet(num, info);
     }
   }, [amount, direction, age, disability, childrenCount, payments, region]);
+
+  // EASTER EGG LOGIC
+  // Escuchar si el usuario escribe "borja" para abrir el portfolio secreto
+  import('react').then((React) => {
+    React.useEffect(() => {
+      let keySequence = "";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        keySequence += e.key.toLowerCase();
+        // Mantener solo los ultimos 5 caracteres
+        if (keySequence.length > 5) {
+          keySequence = keySequence.slice(-5);
+        }
+        
+        if(keySequence === "borja" && !isCVMOpen) {
+          setIsCVMOpen(true);
+        }
+      };
+      
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isCVMOpen]);
+  });
+
 
   return (
     <div className="min-h-screen relative overflow-x-hidden selection:bg-blue-500/30 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-500">
@@ -146,6 +172,8 @@ export default function App() {
       </footer>
 
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <InteractiveCVModal isOpen={isCVMOpen} onClose={() => setIsCVMOpen(false)} />
+      <InstallPWAPrompt />
     </div>
   );
 }
