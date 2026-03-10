@@ -68,6 +68,15 @@ export function CompanyCosts({ grossAnnual, employerCosts }: CompanyCostsProps) 
                     <span className="font-medium text-slate-700 dark:text-slate-200">{(employerCosts.training + employerCosts.fogasa + employerCosts.mei + employerCosts.accident).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
                 </div>
             </div>
+
+            <div className="mt-8 bg-indigo-500/10 dark:bg-indigo-500/5 p-4 rounded-2xl border border-indigo-200 dark:border-indigo-500/20 text-sm">
+                <p className="text-indigo-900 dark:text-indigo-300 font-medium mb-2">
+                    🛡️ Auditoría de Costes Ocultos
+                </p>
+                <p className="text-slate-600 dark:text-slate-400">
+                    A menudo, los trabajadores no son conscientes del "salario invisible". De cada euro de tu salario bruto, la empresa debe abonar un extra (aprox. un 30% a 35%) directamente al Estado antes de que tú recibas tu nómina para sostener el Estado de Bienestar. Este es el verdadero desembolso para crear tu puesto de trabajo.
+                </p>
+            </div>
         </div>
     );
 }

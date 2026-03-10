@@ -154,7 +154,7 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                             return (
                                 <div
                                     key={idx}
-                                    className={`h-full ${item.fill} transition-all duration-500 ease-out border-r border-white/20 last:border-0 hover:brightness-110 flex items-center justify-center`}
+                                    className={`h-full ${item.fill} transition-all duration-500 ease-out border-r border-white/20 last:border-0 hover:brightness-110 flex items-center justify-center relative z-0`}
                                     style={{ width: `${pct}%` }}
                                     title={`${item.name}: ${item.value}€`}
                                 >
@@ -162,7 +162,20 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                                 </div>
                             )
                         })}
-                        {/* Espacio vacío = Ahorro / Déficit ya se sobrepasa visualmente si pasa de 100 */}
+
+                        {/* 50/30/20 Visual Markers */}
+                        <div className="absolute top-0 bottom-0 left-[50%] w-0.5 bg-slate-600 dark:bg-white opacity-40 z-10 border-l border-white/20 mix-blend-overlay" title="Límite 50% Necesidades"></div>
+                        <div className="absolute top-0 bottom-0 left-[80%] w-0.5 bg-slate-600 dark:bg-white opacity-40 z-10 border-l border-white/20 mix-blend-overlay" title="Límite 30% Deseos (Ahorro 20%)"></div>
+                    </div>
+
+                    {/* Leyenda 50/30/20 debajo de la barra */}
+                    <div className="relative w-full h-6 mt-1 hidden sm:block">
+                        <div className="absolute top-0 left-[50%] w-px h-2 bg-slate-300 dark:bg-slate-600"></div>
+                        <div className="absolute top-0 left-[80%] w-px h-2 bg-slate-300 dark:bg-slate-600"></div>
+
+                        <span className="absolute top-2 left-[25%] -translate-x-1/2 text-[9px] font-bold text-slate-400 tracking-wider">NECESIDADES (Ideal 50%)</span>
+                        <span className="absolute top-2 left-[65%] -translate-x-1/2 text-[9px] font-bold text-slate-400 tracking-wider">DESEOS (Ideal 30%)</span>
+                        <span className="absolute top-2 left-[90%] -translate-x-1/2 text-[9px] font-bold text-slate-400 tracking-wider">AHORRO (Ideal 20%)</span>
                     </div>
 
                     {/* Leyenda Analítica Minimalista */}

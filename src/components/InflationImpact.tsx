@@ -9,20 +9,24 @@ interface InflationImpactProps {
 
 export function InflationImpact({ netMonthly, fixedExpenses }: InflationImpactProps) {
     const [inflationRate, setInflationRate] = useState<number>(3.5); // Default moderate
+    const [salaryIncrease, setSalaryIncrease] = useState<number>(2.0); // Default subida
 
     const generateDataOptionB = () => {
         const data = [];
-        const nominalSalary = netMonthly; // Fijo (congelado)
+        let nominalSalary = netMonthly; // Fijo (congelado)
         let costOfLiving = fixedExpenses; // Sube con inflación
 
         for (let year = 0; year <= 5; year++) {
             data.push({
                 year: year === 0 ? 'Hoy' : `Año ${year}`,
-                'Sueldo (Nominal)': nominalSalary,
+                'Sueldo (Nominal)': Number(nominalSalary.toFixed(2)),
                 'Gastos Fijos': Number(costOfLiving.toFixed(2)),
                 'Capacidad Ahorro': Math.max(0, nominalSalary - costOfLiving)
             });
-            costOfLiving = costOfLiving * (1 + (inflationRate / 100));
+            if (year < 5) {
+                nominalSalary = nominalSalary * (1 + (salaryIncrease / 100));
+                costOfLiving = costOfLiving * (1 + (inflationRate / 100));
+            }
         }
         return data;
     }
@@ -49,7 +53,7 @@ export function InflationImpact({ netMonthly, fixedExpenses }: InflationImpactPr
                 <div className="grid md:grid-cols-12 gap-8 items-start">
                     <div className="md:col-span-4 space-y-6">
                         <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                            Simula cómo la inflación empobrece tu capacidad de ahorro a 5 años si tu sueldo permanece congelado y tus gastos fijos aumentan.
+                            Simula cómo la inflación y tu subida de sueldo compiten a 5 años, impactando directamente en tu capacidad de ahorro mensual.
                         </p>
 
                         <div className="bg-slate-900/50 backdrop-blur border border-slate-800 rounded-2xl p-5">
@@ -72,6 +76,22 @@ export function InflationImpact({ netMonthly, fixedExpenses }: InflationImpactPr
                                 <button onClick={() => setInflationRate(3.5)} className="hover:text-amber-400 transition-colors">Actual (3.5%)</button>
                                 <button onClick={() => setInflationRate(7)} className="hover:text-rose-400 transition-colors">Crisis (7%)</button>
                             </div>
+
+                            <div className="h-px w-full bg-slate-800 mb-6"></div>
+
+                            <div className="flex justify-between items-center mb-4">
+                                <label className="text-sm font-semibold text-slate-300">Subida Salarial Anual</label>
+                                <span className="font-black text-emerald-500 text-lg">{salaryIncrease.toFixed(1)}%</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="10"
+                                step="0.5"
+                                value={salaryIncrease}
+                                onChange={(e) => setSalaryIncrease(Number(e.target.value))}
+                                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            />
                         </div>
 
                         <div className={`p-5 rounded-2xl border ${futureSavings <= 0 ? 'bg-rose-950/40 border-rose-900/50' : 'bg-slate-900/50 border-slate-800'}`}>
@@ -80,9 +100,11 @@ export function InflationImpact({ netMonthly, fixedExpenses }: InflationImpactPr
                                 <div>
                                     <h4 className="text-sm font-semibold text-slate-200 mb-1">Impacto a 5 años</h4>
                                     {futureSavings <= 0 ? (
-                                        <p className="text-xs text-slate-400">Pérdida total del ahorro. Entrarás en déficit de <span className="text-rose-400 font-bold">{Math.abs(futureSavings).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span> mensual.</p>
+                                        <p className="text-xs text-slate-400">Tus gastos se comen tu sueldo. Entrarás en déficit de <span className="text-rose-400 font-bold">{Math.abs(futureSavings).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span> mensual.</p>
+                                    ) : futureSavings > currentSavings ? (
+                                        <p className="text-xs text-slate-400">Tu sueldo vence a la inflación. Tu ahorro subirá a <span className="text-emerald-400 font-bold">{futureSavings.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span> mensual.</p>
                                     ) : (
-                                        <p className="text-xs text-slate-400">Tu ahorro mensual caerá de <strong>{currentSavings.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</strong> a <span className="text-rose-400 font-bold">{futureSavings.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span>.</p>
+                                        <p className="text-xs text-slate-400">La inflación gana. Tu ahorro mensual caerá de <strong>{currentSavings.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</strong> a <span className="text-rose-400 font-bold">{futureSavings.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span>.</p>
                                     )}
                                 </div>
                             </div>
