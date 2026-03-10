@@ -71,6 +71,7 @@ export function LivingCostDashboard({ netMonthly }: LivingCostDashboardProps) {
                                     ))}
                                 </Pie>
                                 <Tooltip
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     formatter={(value: any) => Number(value).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                 />
@@ -204,7 +205,7 @@ function CostInput({ label, icon, value, setValue, max }: { label: string, icon:
                         max={max * 2}
                         value={value === 0 ? '' : value}
                         onChange={(e) => {
-                            let val = parseInt(e.target.value) || 0;
+                            const val = parseInt(e.target.value) || 0;
                             setValue(val);
                         }}
                         placeholder="0"

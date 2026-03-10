@@ -1,4 +1,4 @@
-import { PieChart, Home, Clock, Smartphone, Coffee, Layers } from 'lucide-react';
+import { PieChart, Home, Clock, Smartphone, Coffee, Layers, Flame } from 'lucide-react';
 import { useState } from 'react';
 
 export interface FinancialInsightsProps {
@@ -11,6 +11,8 @@ export interface FinancialInsightsProps {
 
 export function FinancialInsights({ insights }: FinancialInsightsProps) {
     const [financingPct, setFinancingPct] = useState(80);
+    const [inflationRate, setInflationRate] = useState(3.5);
+
     const needs = insights.budgetRule.needs;
     const wants = insights.budgetRule.wants;
     const savings = insights.budgetRule.savings;
@@ -26,6 +28,13 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
     const houseValue = loanAmount / (financingPct / 100);
     const requiredSavings = houseValue - loanAmount + (houseValue * 0.10); // +10% de gastos de C-V aproximados
 
+    // Matemática de Inflación (El Ladrón Invisible)
+    // El ahorro parado pierde poder adquisitivo. ¿Cuánto valor real pierden mis ahorros de un año (savings * 12) al año siguiente?
+    const annualSavings = savings * 12;
+    const realPurchasingPower = annualSavings / (1 + (inflationRate / 100));
+    const annualLoss = annualSavings - realPurchasingPower;
+    const monthlyLoss = annualLoss / 12;
+
     return (
         <div className="mt-8 space-y-6 animate-fadeIn">
             <h3 className="text-xl font-medium text-slate-800 dark:text-slate-100 flex items-center gap-3">
@@ -35,7 +44,7 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                 Analítica Financiera Zen
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
 
                 {/* Rule 50/30/20 Card - Zen Mode con Img */}
                 <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 group">
@@ -192,6 +201,53 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                                     <p className="text-[10px] text-slate-500">{phoneCost.toFixed(1)} días enteros de trabajo</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Inflation Impact Card - Zen Mode Interactivo */}
+                <div className="relative overflow-hidden rounded-[2rem] bg-rose-50/40 dark:bg-rose-900/10 backdrop-blur-xl border border-rose-100/50 dark:border-rose-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all flex flex-col justify-between group">
+                    <div className="absolute inset-0 opacity-20 dark:opacity-30 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-opacity duration-700 group-hover:opacity-40">
+                        <img src="/assets/zen_inflation_3d.png" alt="Inflation 3D" className="w-full h-full object-cover rounded-[2rem]" />
+                    </div>
+
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-5">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-900/40 dark:to-red-900/40 flex items-center justify-center border border-rose-200 dark:border-rose-800/30 shadow-sm">
+                                <Flame className="text-rose-500 dark:text-rose-400" size={24} strokeWidth={1.5} />
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[10px] uppercase font-bold text-rose-500/70 dark:text-rose-400/70 tracking-wider mb-1">Escenario IPC</p>
+                                <select
+                                    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-rose-200 dark:border-rose-800 font-bold text-xs text-rose-600 dark:text-rose-400 rounded-lg outline-none cursor-pointer focus:ring-2 focus:ring-rose-400/50 p-1.5 shadow-sm"
+                                    value={inflationRate}
+                                    onChange={(e) => setInflationRate(Number(e.target.value))}
+                                >
+                                    <option value={2.0}>BCE (2.0%)</option>
+                                    <option value={3.5}>Presión (3.5%)</option>
+                                    <option value={5.5}>Geopolítica (5.5%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">El Ladrón Invisible</h4>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 leading-relaxed">
+                            A este nivel de IPC, si dejas tus <strong className="text-slate-700 dark:text-slate-300">{savings.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€</strong> de ahorro mensual paralizados en liquidez, la erosión será inminente.
+                        </p>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-rose-100 dark:border-rose-900/40 relative z-10">
+                        <div className="flex flex-col gap-1">
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Pérdida de poder adquisitivo</p>
+                            <div className="flex items-end gap-2">
+                                <span className="text-3xl font-light tracking-tight text-rose-600 dark:text-rose-400">
+                                    -{monthlyLoss.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} <span className="text-xl">€</span>
+                                </span>
+                                <span className="text-sm font-medium text-rose-400/70 dark:text-rose-500/70 mb-1">/ mes</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-2 leading-relaxed bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg">
+                                En 1 año, tus ahorros anuales comprarán el equivalente a <strong className="text-rose-600 dark:text-rose-400">{annualLoss.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€</strong> menos. Busca rentabilidad.
+                            </p>
                         </div>
                     </div>
                 </div>

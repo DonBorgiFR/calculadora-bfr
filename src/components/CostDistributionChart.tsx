@@ -47,6 +47,7 @@ export function CostDistributionChart({
                             ))}
                         </Pie>
                         <RechartsTooltip
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             formatter={(value: any) => `${Number(value).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`}
                             contentStyle={{
                                 backgroundColor: 'rgba(15, 23, 42, 0.9)',

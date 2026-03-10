@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { InputPanel } from './components/InputPanel';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { DidacticExplanation } from './components/DidacticExplanation';
 import { AboutModal } from './components/AboutModal';
 import { Info } from 'lucide-react';
 import { calculateFromGross, calculateFromNet } from './lib/salary-engine';
-import type { CalculationResult } from './lib/salary-engine';
 import { Region } from './lib/types';
 
 export default function App() {
@@ -18,8 +17,6 @@ export default function App() {
 
   const [region, setRegion] = useState<Region>(Region.GENERAL);
 
-  const [result, setResult] = useState<CalculationResult | null>(null);
-
   // Modal de Portfolio
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
@@ -29,11 +26,10 @@ export default function App() {
   // Fase 11: UX Minimalista
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
 
-  useEffect(() => {
+  const result = useMemo(() => {
     const num = parseFloat(amount);
     if (isNaN(num) || num <= 0) {
-      setResult(null);
-      return;
+      return null;
     }
 
     const info = {
@@ -45,9 +41,9 @@ export default function App() {
     };
 
     if (direction === 'grossToNet') {
-      setResult(calculateFromGross(num, info));
+      return calculateFromGross(num, info);
     } else {
-      setResult(calculateFromNet(num, info));
+      return calculateFromNet(num, info);
     }
   }, [amount, direction, age, disability, childrenCount, payments, region]);
 
