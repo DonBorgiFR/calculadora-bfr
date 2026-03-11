@@ -1,4 +1,4 @@
-import { PieChart, Home, Clock, Smartphone, Coffee, Layers, Flame } from 'lucide-react';
+import { PieChart, Home, Clock, Smartphone, Coffee, Layers, Flame, TrendingUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 export interface FinancialInsightsProps {
@@ -6,10 +6,63 @@ export interface FinancialInsightsProps {
         budgetRule: { needs: number; wants: number; savings: number };
         maxMortgage: number;
         hourlyLifeValue: number;
+        investment?: {
+            monthlyContribution: number;
+            projected10Years: number;
+        };
     };
 }
 
+// Helper para el acordeón minimialista
+function AccordionItem({ id, activeId, setActiveId, title, subtitle, icon: Icon, iconColor, iconBg, bgElement, children }: any) {
+    const isActive = activeId === id;
+    
+    return (
+        <div className={`relative rounded-[2rem] border transition-all duration-500 overflow-hidden ${
+            isActive
+                ? "border-slate-200/50 dark:border-slate-700/50 bg-white/60 dark:bg-slate-900/60 shadow-xl backdrop-blur-xl"
+                : "border-transparent bg-white/40 dark:bg-slate-800/40 hover:bg-white/60 dark:hover:bg-slate-800/60 backdrop-blur-md cursor-pointer shadow-sm group"
+        }`}>
+            {/* Fondo decorativo (solo visible al expandir o al hacer hover) */}
+            <div className={`transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>
+                {bgElement}
+            </div>
+
+            <div 
+                className="relative z-20 flex items-center justify-between p-5 sm:p-7 select-none cursor-pointer"
+                onClick={() => setActiveId(isActive ? null : id)}
+            >
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center border shadow-sm transition-transform duration-300 ${iconBg} ${isActive ? 'scale-110' : ''}`}>
+                        <Icon className={iconColor} size={24} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">{title}</h4>
+                        {!isActive && subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block mt-0.5 pr-4 line-clamp-1">{subtitle}</p>}
+                    </div>
+                </div>
+                <div className={`shrink-0 p-2 rounded-full transition-colors ${isActive ? 'bg-slate-200 dark:bg-slate-800' : 'bg-transparent'}`}>
+                    <ChevronDown
+                        size={20}
+                        className={`text-slate-400 transition-transform duration-500 ${isActive ? "rotate-180" : ""}`}
+                    />
+                </div>
+            </div>
+            
+            <div className={`relative z-20 grid transition-all duration-500 ease-in-out ${isActive ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                <div className="overflow-hidden">
+                    <div className="px-5 sm:px-7 pb-7 pt-0">
+                        {subtitle && <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 leading-relaxed border-b border-slate-100 dark:border-slate-800/80 pb-4">{subtitle}</p>}
+                        {children}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export function FinancialInsights({ insights }: FinancialInsightsProps) {
+    const [activeInsight, setActiveInsight] = useState<string | null>('503020'); // Abierto por defecto
     const [financingPct, setFinancingPct] = useState(80);
     const [inflationRate, setInflationRate] = useState(3.5);
 
@@ -19,17 +72,16 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
     const mortgage = insights.maxMortgage;
     const hourly = insights.hourlyLifeValue;
 
-    // Ejemplos de coste de vida basados en la hora
-    const coffeeCost = 35 / hourly; // Cena de 35€
-    const phoneCost = 800 / (hourly * 8); // Días de trabajo (8h/día)
+    // Ejemplos de coste de vida
+    const coffeeCost = 35 / hourly;
+    const phoneCost = 800 / (hourly * 8);
 
-    // Matemática Inmobiliaria Interactiva
-    const loanAmount = mortgage * 222; // Multiplicador general de hipoteca al 3.5% 30A
+    // Matemática Inmobiliaria
+    const loanAmount = mortgage * 222;
     const houseValue = loanAmount / (financingPct / 100);
-    const requiredSavings = houseValue - loanAmount + (houseValue * 0.10); // +10% de gastos de C-V aproximados
+    const requiredSavings = houseValue - loanAmount + (houseValue * 0.10);
 
-    // Matemática de Inflación (El Ladrón Invisible)
-    // El ahorro parado pierde poder adquisitivo. ¿Cuánto valor real pierden mis ahorros de un año (savings * 12) al año siguiente?
+    // Matemática de Inflación
     const annualSavings = savings * 12;
     const realPurchasingPower = annualSavings / (1 + (inflationRate / 100));
     const annualLoss = annualSavings - realPurchasingPower;
@@ -44,24 +96,25 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                 Analítica Financiera Zen
             </h3>
 
-            <div className="flex flex-col gap-6 lg:gap-8">
+            <div className="flex flex-col gap-4">
 
-                {/* Rule 50/30/20 Card - Zen Mode con Img */}
-                <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 group">
-                    <div className="absolute inset-0 opacity-10 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-opacity duration-700 group-hover:opacity-20">
-                        <img src="/assets/zen_living_cost_bg.png" alt="Zen Background" className="w-full h-full object-cover" />
-                    </div>
-
-                    <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30 shadow-sm relative z-10">
-                        <PieChart className="text-emerald-600 dark:text-emerald-400" size={24} strokeWidth={1.5} />
-                    </div>
-
-                    <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Regla 50/30/20</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
-                        Balance ideal sugerido por Harvard para organizar tu sueldo.
-                    </p>
-
-                    <div className="mt-6 space-y-4">
+                {/* 1. Rule 50/30/20 */}
+                <AccordionItem
+                    id="503020"
+                    activeId={activeInsight}
+                    setActiveId={setActiveInsight}
+                    title="Regla 50/30/20"
+                    subtitle="Balance sugerido por Harvard para organizar tu sueldo y alcanzar la libertad financiera."
+                    icon={PieChart}
+                    iconColor="text-emerald-600 dark:text-emerald-400"
+                    iconBg="bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-[0.5px] border-emerald-100 dark:border-emerald-800/30"
+                    bgElement={
+                        <div className="absolute inset-0 opacity-10 mix-blend-multiply dark:mix-blend-screen pointer-events-none">
+                            <img src="/assets/zen_living_cost_bg.png" alt="Zen" className="w-full h-full object-cover" />
+                        </div>
+                    }
+                >
+                    <div className="space-y-4">
                         <div className="group">
                             <div className="flex justify-between text-sm mb-1.5 font-medium">
                                 <span className="text-emerald-600 dark:text-emerald-400">Necesidades 50%</span>
@@ -93,28 +146,23 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                             <p className="text-[11px] text-slate-400 mt-1">Inversión y fondo de emergencia.</p>
                         </div>
                     </div>
-                </div>
+                </AccordionItem>
 
-                {/* Mortgage Capability Card - Zen Mode Interactivo */}
-                <div className="relative overflow-hidden rounded-[2rem] bg-indigo-50/40 dark:bg-indigo-900/10 backdrop-blur-xl border border-indigo-100/50 dark:border-indigo-800/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all flex flex-col justify-between group">
-
-                    {/* Floating 3D Icon GenImage */}
-                    <div className="absolute -right-6 -top-6 w-40 h-40 opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-110">
-                        <img src="/assets/zen_mortgage_3d.png" alt="3D Key" className="w-full h-full object-contain drop-shadow-2xl" />
-                    </div>
-
-                    <div className="relative z-10">
-                        <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center border border-blue-200 dark:border-blue-800/30 shadow-sm">
-                            <Home className="text-blue-600 dark:text-blue-400" size={24} strokeWidth={1.5} />
-                        </div>
-
-                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Poder Adquisitivo Hipotecario</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 leading-relaxed">
-                            Respetando el max 30% del BCE. Te protege dejándote un <span className="text-indigo-500 font-medium">70% libre</span> frente a imprevistos o subidas de tipos.
-                        </p>
-                    </div>
-
-                    <div className="mt-6 space-y-4 relative z-10">
+                {/* 2. Mortgage */}
+                <AccordionItem
+                    id="mortgage"
+                    activeId={activeInsight}
+                    setActiveId={setActiveInsight}
+                    title="Poder Adquisitivo Hipotecario"
+                    subtitle="Cuota calculada según BC para dejarte un 70% libre frente a subidas de tipos."
+                    icon={Home}
+                    iconColor="text-blue-600 dark:text-blue-400"
+                    iconBg="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border-[0.5px] border-blue-200 dark:border-blue-800/30"
+                    bgElement={
+                        <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-400/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                    }
+                >
+                    <div className="space-y-4">
                         <div className="flex justify-between items-end border-b border-indigo-100 dark:border-indigo-800/40 pb-4">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Cuota blindada (Max)</p>
@@ -155,88 +203,85 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </AccordionItem>
 
-                {/* Time Value Card - Zen Mode */}
-                <div className="relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all hover:bg-white/80 dark:hover:bg-slate-900/70 flex flex-col justify-between">
-                    <div className="absolute top-10 left-10 w-40 h-40 bg-orange-400/5 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-
-                    <div>
-                        <div className="w-12 h-12 mb-5 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 flex items-center justify-center border border-orange-100 dark:border-orange-800/30 shadow-sm">
-                            <Clock className="text-orange-500 dark:text-orange-400" size={24} strokeWidth={1.5} />
-                        </div>
-
-                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">Tu Hora de Vida</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
-                            Monetiza tu tiempo para tomar decisiones de compra más sensatas.
-                        </p>
-                    </div>
-
-                    <div className="mt-8 space-y-4">
+                {/* 3. Time Value */}
+                <AccordionItem
+                    id="time"
+                    activeId={activeInsight}
+                    setActiveId={setActiveInsight}
+                    title="Tu Hora de Vida"
+                    subtitle="Monetiza tu tiempo para tomar decisiones de compra más sensatas y evitar caprichos."
+                    icon={Clock}
+                    iconColor="text-orange-500 dark:text-orange-400"
+                    iconBg="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 border-[0.5px] border-orange-100 dark:border-orange-800/30"
+                    bgElement={
+                        <div className="absolute top-10 left-10 w-40 h-40 bg-orange-400/5 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+                    }
+                >
+                    <div className="space-y-4">
                         <div>
                             <span className="text-4xl font-light tracking-tight text-slate-800 dark:text-slate-100">
                                 {hourly.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} <span className="text-xl text-orange-500">€/h</span>
                             </span>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
+                        <div className="pt-4  space-y-3">
                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Costes reales en tiempo de trabajo:</p>
 
-                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5">
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5 border border-slate-100 dark:border-slate-800">
                                 <div className="bg-white dark:bg-slate-700 p-1.5 rounded-lg shadow-sm">
                                     <Coffee size={14} className="text-slate-600 dark:text-slate-300" />
                                 </div>
                                 <div>
-                                    <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200">Cena fuera (35€)</p>
-                                    <p className="text-[10px] text-slate-500">{coffeeCost.toFixed(1)} horas de tu vida</p>
+                                    <p className="text-xs font-medium text-slate-800 dark:text-slate-200">Cena fuera (35€)</p>
+                                    <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">{coffeeCost.toFixed(1)} horas de tu vida</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5">
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5 border border-slate-100 dark:border-slate-800">
                                 <div className="bg-white dark:bg-slate-700 p-1.5 rounded-lg shadow-sm">
                                     <Smartphone size={14} className="text-slate-600 dark:text-slate-300" />
                                 </div>
                                 <div>
-                                    <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200">Móvil Nuevo (800€)</p>
-                                    <p className="text-[10px] text-slate-500">{phoneCost.toFixed(1)} días enteros de trabajo</p>
+                                    <p className="text-xs font-medium text-slate-800 dark:text-slate-200">Móvil Nuevo (800€)</p>
+                                    <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">{phoneCost.toFixed(1)} días enteros de trabajo</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </AccordionItem>
 
-                {/* Inflation Impact Card - Zen Mode Interactivo */}
-                <div className="relative overflow-hidden rounded-[2rem] bg-rose-50/40 dark:bg-rose-900/10 backdrop-blur-xl border border-rose-100/50 dark:border-rose-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-7 transition-all flex flex-col justify-between group">
-                    <div className="absolute inset-0 opacity-20 dark:opacity-30 mix-blend-multiply dark:mix-blend-screen pointer-events-none transition-opacity duration-700 group-hover:opacity-40">
-                        <img src="/assets/zen_inflation_3d.png" alt="Inflation 3D" className="w-full h-full object-cover rounded-[2rem]" />
-                    </div>
-
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-5">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-900/40 dark:to-red-900/40 flex items-center justify-center border border-rose-200 dark:border-rose-800/30 shadow-sm">
-                                <Flame className="text-rose-500 dark:text-rose-400" size={24} strokeWidth={1.5} />
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] uppercase font-bold text-rose-500/70 dark:text-rose-400/70 tracking-wider mb-1">Escenario IPC</p>
-                                <select
-                                    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-rose-200 dark:border-rose-800 font-bold text-xs text-rose-600 dark:text-rose-400 rounded-lg outline-none cursor-pointer focus:ring-2 focus:ring-rose-400/50 p-1.5 shadow-sm"
-                                    value={inflationRate}
-                                    onChange={(e) => setInflationRate(Number(e.target.value))}
-                                >
-                                    <option value={2.0}>BCE (2.0%)</option>
-                                    <option value={3.5}>Presión (3.5%)</option>
-                                    <option value={5.5}>Geopolítica (5.5%)</option>
-                                </select>
-                            </div>
+                {/* 4. Inflation */}
+                <AccordionItem
+                    id="inflation"
+                    activeId={activeInsight}
+                    setActiveId={setActiveInsight}
+                    title="El Ladrón Invisible"
+                    subtitle={`Tus ${savings.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€/mes pierden valor adquisitivo con la inflación si los dejas parados.`}
+                    icon={Flame}
+                    iconColor="text-rose-500 dark:text-rose-400"
+                    iconBg="bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-900/40 dark:to-red-900/40 border-[0.5px] border-rose-200 dark:border-rose-800/30"
+                    bgElement={
+                        <div className="absolute -left-10 bottom-0 w-40 h-40 bg-rose-400/5 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+                    }
+                >
+                    <div className="flex justify-end items-start mb-5 relative z-20">
+                        <div className="text-right">
+                            <p className="text-[10px] uppercase font-bold text-rose-500/70 dark:text-rose-400/70 tracking-wider mb-1">Escenario IPC</p>
+                            <select
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-rose-200 dark:border-rose-800 font-bold text-xs text-rose-600 dark:text-rose-400 rounded-lg outline-none cursor-pointer focus:ring-2 focus:ring-rose-400/50 p-1.5 shadow-sm"
+                                value={inflationRate}
+                                onChange={(e) => setInflationRate(Number(e.target.value))}
+                            >
+                                <option value={2.0}>BCE (2.0%)</option>
+                                <option value={3.5}>Presión (3.5%)</option>
+                                <option value={5.5}>Geopolítica (5.5%)</option>
+                            </select>
                         </div>
-
-                        <h4 className="text-slate-800 dark:text-slate-100 font-semibold text-lg">El Ladrón Invisible</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 leading-relaxed">
-                            A este nivel de IPC, si dejas tus <strong className="text-slate-700 dark:text-slate-300">{savings.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€</strong> de ahorro mensual paralizados en liquidez, la erosión será inminente.
-                        </p>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-rose-100 dark:border-rose-900/40 relative z-10">
+                    <div className="pt-2 relative z-10">
                         <div className="flex flex-col gap-1">
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Pérdida de poder adquisitivo</p>
                             <div className="flex items-end gap-2">
@@ -245,12 +290,49 @@ export function FinancialInsights({ insights }: FinancialInsightsProps) {
                                 </span>
                                 <span className="text-sm font-medium text-rose-400/70 dark:text-rose-500/70 mb-1">/ mes</span>
                             </div>
-                            <p className="text-[11px] text-slate-500 mt-2 leading-relaxed bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg">
-                                En 1 año, tus ahorros anuales comprarán el equivalente a <strong className="text-rose-600 dark:text-rose-400">{annualLoss.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€</strong> menos. Busca rentabilidad.
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-3 leading-relaxed bg-white/50 dark:bg-slate-900/50 p-3 rounded-xl border border-rose-100/50 dark:border-rose-900/30 shadow-sm">
+                                En 1 año, tus ahorros anuales comprarán el equivalente a <strong className="text-lg text-rose-600 dark:text-rose-400 font-bold mx-1">{annualLoss.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€</strong> menos.
                             </p>
                         </div>
                     </div>
-                </div>
+                </AccordionItem>
+
+                {/* 5. Investment */}
+                {insights.investment && (
+                    <AccordionItem
+                        id="investment"
+                        activeId={activeInsight}
+                        setActiveId={setActiveInsight}
+                        title="Proyección de Inversión"
+                        subtitle={`Invirtiendo ${insights.investment.monthlyContribution.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}€ al mes al 7% anual (S&P 500) a largo plazo.`}
+                        icon={TrendingUp}
+                        iconColor="text-emerald-500 dark:text-emerald-400"
+                        iconBg="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/40 dark:to-teal-900/40 border-[0.5px] border-emerald-200 dark:border-emerald-800/30"
+                        bgElement={
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-400/5 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+                        }
+                    >
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Ahorro Tradicional (Sin rent.)</p>
+                                <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+                                    {(insights.investment.monthlyContribution * 120).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-emerald-500/80 dark:text-emerald-400/80 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                                    Valor a 10 Años <Flame size={12}/>
+                                </p>
+                                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                                    {insights.investment.projected10Years.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                                </p>
+                                <p className="text-[10px] text-emerald-500 mt-1 bg-emerald-100/50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full inline-block">
+                                    +{ (insights.investment.projected10Years - (insights.investment.monthlyContribution * 120)).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }€ extra
+                                </p>
+                            </div>
+                        </div>
+                    </AccordionItem>
+                )}
 
             </div>
         </div>

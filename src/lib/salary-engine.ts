@@ -55,6 +55,10 @@ export interface CalculationResult {
         budgetRule: { needs: number; wants: number; savings: number };
         maxMortgage: number;
         hourlyLifeValue: number;
+        investment?: {
+            monthlyContribution: number;
+            projected10Years: number;
+        };
     };
 }
 
@@ -142,8 +146,14 @@ function calculatePersonalMinimum(info: PersonalInfo): number {
         minimum += PERSONAL_MINIMUMS.DISABILITY_33;
     }
 
+    // Tramos familiares (Hijos)
     if (info.childrenCount >= 1) minimum += PERSONAL_MINIMUMS.CHILD_1;
     if (info.childrenCount >= 2) minimum += PERSONAL_MINIMUMS.CHILD_2;
+    if (info.childrenCount >= 3) minimum += PERSONAL_MINIMUMS.CHILD_3;
+    if (info.childrenCount >= 4) {
+        const extraChildren = info.childrenCount - 3;
+        minimum += PERSONAL_MINIMUMS.CHILD_4_PLUS * extraChildren;
+    }
 
     return minimum;
 }
@@ -207,18 +217,27 @@ export function calculateFromGross(grossAnnual: number, info: PersonalInfo): Cal
 
     const employerCosts = calculateEmployerSocialSecurity(grossAnnual);
 
+    // Inversión teórica basada en la regla 50/30/20 (20% de ahorro ahorrado consistentemente)
+    const genericSavings = netMonthly * 0.20;
+    const invRate = 0.07 / 12; // 7% anual
+    const genericProjected10Years = genericSavings * ((Math.pow(1 + invRate, 120) - 1) / invRate) * (1 + invRate);
+
     // KI: Inteligencia Financiera
     const financialInsights = {
         budgetRule: {
             needs: netMonthly * 0.50,
             wants: netMonthly * 0.30,
-            savings: netMonthly * 0.20
+            savings: genericSavings
         },
         // 30% del sueldo neto
         maxMortgage: netMonthly * 0.30,
         // Jornada estándar de 1760h / 12 meses -> ~146.6h mes. O Net Anual / 1760.
         // Vamos a usar Net Annual / 1760
-        hourlyLifeValue: netAnnual / 1760
+        hourlyLifeValue: netAnnual / 1760,
+        investment: {
+            monthlyContribution: genericSavings,
+            projected10Years: genericProjected10Years
+        }
     };
 
     return {
@@ -288,6 +307,14 @@ export function calculateInsights(
     // Valor Tiempo: Asumiendo jornada completa normalizada legal 160h.
     const hourlyRate = netMonthly / 160;
 
+    // Inversión: Proyección a 10 años (120 meses) con interés anual del 7% (0.07 / 12)
+    const investmentRate = 0.07 / 12;
+    const investmentMonths = 120; // 10 years
+    let projected10Years = 0;
+    if (savingsActual > 0) {
+        projected10Years = savingsActual * ((Math.pow(1 + investmentRate, investmentMonths) - 1) / investmentRate) * (1 + investmentRate);
+    }
+
     return {
         rule503020: {
             needsTarget,
@@ -303,6 +330,10 @@ export function calculateInsights(
         },
         timeValue: {
             hourlyRate
+        },
+        investment: {
+            monthlyContribution: savingsActual,
+            projected10Years
         }
     };
 }

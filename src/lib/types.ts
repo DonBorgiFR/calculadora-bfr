@@ -29,4 +29,8 @@ export interface FinancialInsightsResult {
     timeValue: {
         hourlyRate: number;
     };
+    investment: {
+        monthlyContribution: number;
+        projected10Years: number; // Compounded at 7% annually
+    };
 }

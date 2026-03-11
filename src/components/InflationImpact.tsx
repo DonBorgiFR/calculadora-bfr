@@ -46,7 +46,7 @@ export function InflationImpact({ netMonthly, fixedExpenses }: InflationImpactPr
                 <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-4">
                     <TrendingDown className="text-rose-500" size={28} />
                     <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-rose-600 tracking-tight">
-                        Erosión Inflacionaria (MACRO)
+                        Erosión Inflacionaria
                     </h3>
                 </div>
 

@@ -27,6 +27,8 @@ export const PERSONAL_MINIMUMS = {
     DISABILITY_65: 9000,
     CHILD_1: 2400,
     CHILD_2: 2700,
+    CHILD_3: 4000,
+    CHILD_4_PLUS: 4500,
 };
 
 // 1. Tabla General Completa (Si no se selecciona autonomía)
