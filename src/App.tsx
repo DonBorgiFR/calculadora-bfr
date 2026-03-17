@@ -1,3 +1,4 @@
+// Version: Rediseño Minimalista (March 11) - Force Redeploy
 import { useState, useMemo } from 'react';
 import { InputPanel } from './components/InputPanel';
 import { ResultsDashboard } from './components/ResultsDashboard';
